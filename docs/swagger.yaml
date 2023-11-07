@@ -1,0 +1,157 @@
+openapi: 3.0.2
+info:
+    title: Games-API
+    version: 1.0.0
+    description: >-
+        ### This is a Swagger UI for our Games API  
+
+
+        ### Error handling
+
+        Errors are presented using the HTTP status codes 400-599. The response includes a more detailed
+        explanation about the error in the body.
+
+
+        ```
+
+        {
+          "error": "Cleartext explanation of the error that occurred"
+        }
+
+        ```
+
+
+        ### Generic API errors
+
+        These error responses can be returned by any of the described endpoints.
+
+
+        | HTTP status  |  Description |
+
+        |---|---|
+
+        | 400| Bad input parameters or invalid request. More information can be found in the response body.
+
+        | 401| The consumer does not have access to the requested resource or the provided token is not valid.
+
+        | 404| The requested resource cannot be found or the user does not have access to the resource.
+
+        | 5XX| A server error has occurred while processing the request.
+paths:
+    '/games/:id':
+        summary: Get full details of a game
+        description: |
+            Returns full details of a give id game
+        get:
+            tags:
+                - details
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: string
+                            examples:
+                                Full details of a given game:
+                                    value: |-
+                                        {"id": 1,"name":"CS2","price": 10.99},
+                                        {"id": 2,"name":"GTA VI","price": 20.99},
+                                        {"id": 3,"name":"CS GO","price": 30.99}
+                '404':
+                    content:
+                        application/json: {}
+            operationId: id
+            summary: Get full details of a game
+            description: |
+                Returns full details of a given id game
+    /games:
+        get:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                type: string
+                        examples:
+                            List of games:
+                                value:
+                                    - CS2
+                                    - GTA VI
+                                    - CS GO
+            tags:
+                - games
+            responses:
+                '200': {}
+            summary: Get a list of all games
+            description: Returns a list of all games in the API
+        post:
+            requestBody:
+                description: 'A new game to be created ning muuda ära, et klientidelt nõutakse taotluse keha'
+                required: true
+            tags:
+                - new-game
+            responses:
+                '201':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/new-game'
+                    description: Error 201
+                '400':
+                    description: One or all params are missing
+            summary: Creates a game
+            description: Creates a new game
+        delete:
+            tags:
+                - delete
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/delete-game'
+                '400': {}
+            summary: Delete game
+            description: |
+                Deleted game
+components:
+    schemas:
+        error:
+            title: Root Type for error
+            description: ''
+            type: object
+            properties:
+                error:
+                    type: string
+            example:
+                error: Error message.
+        delete-game:
+            description: ''
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    description: ''
+                    type: string
+            example:
+                id: 3
+        new-game:
+            title: Root Type for newgame
+            description: ''
+            required:
+                - name
+                - price
+            type: object
+            properties:
+                name:
+                    type: string
+                price:
+                    format: float
+                    type: number
+            example:
+                name: Tetris
+                price: 0.99
