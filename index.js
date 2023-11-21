@@ -8,38 +8,36 @@ const port = 8080;
 const projects = [
     {
         id: 1,
-        project_name: 'Проект 1',
+        project_name: 'Project 1',
         tasks: [
             {
                 report_id: 1,
                 user: {
-                    first_name: 'asdasdas',
-                    last_name: 'dasdasd',
-                    role: 'Директор',
-                    profession: 'Веб-разработчик'
+                    first_name: 'Artjom',
+                    last_name: 'Volkov',
+                    role: 'Director',
+                    profession: 'Veebiarendaja'
                 },
                 entry_time: 323,
-                status: 'подтверждена'
+                status: 'kinnitatud'
             },
-            // Добавьте другие задачи и пользователей по аналогии
         ]
     },
     {
         id: 2,
-        project_name: 'Проект 2',
+        project_name: 'Project 2',
         tasks: [
             {
-                report_id: 4,
+                report_id: 1,
                 user: {
-                    first_name: 'sadsadasda',
-                    last_name: 'xzczxczsdasd',
-                    role: 'Директор',
-                    profession: 'Веб-разработчик'
+                    first_name: 'Maksim',
+                    last_name: 'Ivanov',
+                    role: 'Director',
+                    profession: 'Veebiarendaja'
                 },
-                entry_time: 13,
-                status: 'подтверждена'
+                entry_time: null,
+                status: 'Ootab kontrollimist'
             },
-            // Добавьте другие задачи и пользователей по аналогии
         ]
     }
 ];
@@ -113,7 +111,7 @@ app.post('/projects/:id/tasks', (req, res) => {
         report_id: project.tasks.length + 1,
         user: user,
         entry_time: 0, // Инициализируйте как нужно
-        status: 'Ожидание проверки' // Инициализируйте как нужно
+        status: 'Ootab kontrollimist' // Инициализируйте как нужно
     };
 
     // Добавляем новую задачу к проекту

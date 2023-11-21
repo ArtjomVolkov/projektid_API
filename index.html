@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project List</title>
+    <title>Projektide nimekiri</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
     <style>
         header {
@@ -38,26 +38,28 @@
 <body>
     <div id="app">
         <header>
-            <h1>Project List</h1>
+            <h1>Projektide nimekiri</h1>
+            <button @click="loginAsAdmin">Administraator</button>
+            <button v-if="currentUser.role === 'admin'" @click="loginAsUser">Kasutaja</button>
         </header>
 
         <div class="addPersonForm">
-            <h2>Add Project</h2>
+            <h2>Uue projekti lisamine</h2>
             <form @submit.prevent="addProject">
                 <div class="mb-3">
-                    <label for="projectName" class="form-label">Project Name</label>
+                    <label for="projectName" class="form-label">Projekti nimi</label>
                     <input type="text" class="form-control" id="projectName" v-model="newProjectName">
                 </div>
-                <button type="submit" class="btn btn-primary">Add Project</button>
+                <button type="submit" class="btn btn-primary">Projekti lisamine</button>
             </form>
         </div>
 
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>Project Name</th>
-                    <th>Users</th>
-                    <th>Action</th>
+                    <th>Projekti nimi</th>
+                    <th>Kasutajad</th>
+                    <th v-if="currentUser.role === 'admin'">Meetmed</th>
                 </tr>
             </thead>
             <tbody>
@@ -74,23 +76,22 @@
                         <ul>
                             <li v-for="task in project.tasks" :key="task.report_id">
                                 <!-- Вывод данных о задаче и пользователе -->
-                                Report ID: {{ task.report_id }}<br>
-                                First Name: {{ task.user.first_name ? task.user.first_name : 'N/A' }}<br>
-                                Last Name: {{ task.user.last_name ? task.user.last_name : 'N/A' }}<br>
-                                Role: {{ task.user.role ? task.user.role : 'N/A' }}<br>
-                                Profession: {{ task.user.profession ? task.user.profession : 'N/A' }}<br>
-                                Entry Time: {{ task.entry_time }} hours<br>
+                                Kasutaja ID: {{ task.report_id }}<br>
+                                Nimi: {{ task.user.first_name ? task.user.first_name : 'N/A' }}<br>
+                                Perenimi: {{ task.user.last_name ? task.user.last_name : 'N/A' }}<br>
+                                Roll: {{ task.user.role ? task.user.role : 'N/A' }}<br>
+                                Aeg: {{ task.entry_time }} hours<br>
                                 Status: {{ task.status }}<br>
                                 <!-- Добавьте кнопки для редактирования, удаления и добавления пользователя -->
-                                <button @click="editTask(project, task)">Edit Task</button>
-                                <button @click="removeTask(project, task.report_id)">Delete Task</button>
+                                <button v-if="currentUser.role === 'admin'" @click="editTask(project, task)">Muuta andmeid</button>
+                                <button v-if="currentUser.role === 'admin'" @click="removeTask(project, task.report_id)">Kustuta andmeid</button>
                             </li>
                         </ul>
                     </td>
                     <td>
-                        <button @click="updateProject(project)" class="btn btn-warning" v-if="project.editing">Update</button>
-                        <button @click="removeProject(project.id)" class="btn btn-danger" v-else>Delete</button>
-                        <button @click="addTask(project, task ? task.report_id : 0)">Add User</button>
+                        <button @click="updateProject(project)" class="btn btn-warning" v-if="project.editing">Uuendus</button>
+                        <button v-if="currentUser.role === 'admin'" @click="removeProject(project.id)" class="btn btn-danger" v-else>Kustuta</button>
+                        <button v-if="currentUser.role === 'admin'" @click="addTask(project, task ? task.report_id : 0)">Kasutaja lisamine</button>
                     </td>
                 </tr>
             </tbody>
@@ -109,6 +110,7 @@
                 return {
                     projects: [],
                     newProjectName: '',
+                    currentUser: { role: 'user' },
                 };
             },
             created() {
@@ -116,6 +118,20 @@
                 this.projects.forEach(project => project.editing = false);
             },
             methods: {
+                loginAsAdmin() {
+                    const login = prompt('Sisestage administraatori sisselogimine(login=a)');
+                    const password = prompt('Sisestage administraatori parool(parool=a)');
+
+                    if (login === 'a' && password === 'a') {
+                        this.currentUser = { role: 'admin' };
+                    } else {
+                        alert('Vale kasutajanimi või salasõna. Juurdepääs keelatud.');
+                    }
+                },
+                loginAsUser() {
+                    this.currentUser = { role: 'user' };
+                    alert('Te olete läinud kasutaja alla.');
+                },
                 editProjectName(project) {
                     project.editing = true;
                     project.newName = project.project_name;
@@ -168,74 +184,65 @@
                     });
                 },
                 editTask: function(project, task) {
-                    const fieldToEdit = prompt('Enter the field to edit: first_name(1), last_name(2), role(3), profession(4), entry_time(5)');
+                    const fieldToEdit = prompt('Sisestage number konkreetse välja muutmiseks (eesnimi(1), perekonnanimi(2), roll(3), kellaaeg(4)');
                     if (fieldToEdit === null) {
                         return;
                     }
 
                     switch (fieldToEdit) {
                         case '1':
-                            const newFirstName = prompt('Enter new first name', task.user.first_name);
+                            const newFirstName = prompt('Sisestage uus kasutajanimi', task.user.first_name);
                             if (newFirstName !== null) {
                                 task.user.first_name = newFirstName;
                             }
                             break;
 
                         case '2':
-                            const newLastName = prompt('Enter new last name', task.user.last_name);
+                            const newLastName = prompt('Sisestage uue kasutaja perekonnanimi', task.user.last_name);
                             if (newLastName !== null) {
                                 task.user.last_name = newLastName;
                             }
                             break;
 
                         case '3':
-                            const newRole = prompt('Enter new role', task.user.role);
+                            const newRole = prompt('Sisestage kasutaja roll', task.user.role);
                             if (newRole !== null) {
                                 task.user.role = newRole;
                             }
                             break;
-
                         case '4':
-                            const newProfession = prompt('Enter new profession', task.user.profession);
-                            if (newProfession !== null) {
-                                task.user.profession = newProfession;
+                            const newEntryTime = prompt('Sisestage kasutaja aeg', task.entry_time);
+                            if (newEntryTime !== null) {
+                                const parsedTime = parseInt(newEntryTime, 10);
+                                if (!isNaN(parsedTime) && parsedTime >= 0) {
+                                    // Обновляем entry_time
+                                    task.entry_time = parsedTime;
+                                    // Обновляем статус на "подтверждена"
+                                    task.status = 'kinnitatud';
+                                } else {
+                                    alert('Palun sisestage positiivne ajaväärtus.');
+                                }
                             }
                             break;
-
-                        case '5':
-                        const newEntryTime = prompt('Enter new entry time', task.entry_time);
-                        if (newEntryTime !== null) {
-                            // Обновляем entry_time
-                            task.entry_time = parseInt(newEntryTime, 10) || task.entry_time;
-                            // Обновляем статус на "подтвержден"
-                            task.status = 'подтверждена';
-                        }
-                        break;
                         default:
-                            alert('Invalid field name. Please enter a valid field (first_name, last_name, role, profession, entry_time, status).');
+                            alert('Error.');
                             break;
                     }
-
-                    // Отправьте обновленные данные задачи на сервер
                     this.updateTaskOnServer(project, task);
                 },
                 addTask: function(project, reportId) {
-                    // Запрашиваем у пользователя данные для создания нового пользователя
                     const newFirstName = 'New First Name';
                     const newLastName = 'New Last Name';
-
-                    // Проверяем, существует ли пользователь с таким именем в проекте
                     const existingUser = project.tasks.find(task => task.user.first_name === newFirstName && task.user.last_name === newLastName);
 
                     if (existingUser) {
-                        alert('User with the same name already exists in the project.');
+                        alert('See isik osaleb selles projektis');
                         return;
                     }
 
                     const newRole = 'New Role';
                     const newProfession = 'New Profession';
 
-                    // Создаем новую задачу с новым `report_id` и данными пользователя
                     const newTask = {
                         report_id: project.tasks.length + 1,
                         user: {
@@ -245,21 +252,15 @@
                             profession: newProfession,
                         },
                     };
-
-                    // Добавляем новую задачу к проекту
                     project.tasks.push(newTask);
 
-                    // Отправляем данные новой задачи на сервер
-                    this.addTaskToServer(project, newTask); // Отправляем нового пользователя на сервер
+                    this.addTaskToServer(project, newTask);
 
-                    // Добавляем небольшую задержку (например, 100 миллисекунд) перед обновлением данных
                     setTimeout(() => {
-                        this.fetchProjects(); // После задержки обновляем данные
+                        this.fetchProjects(); // задержка
                     }, 100);
                 },
                 addTaskToServer: function(project, newTask) {
-                    console.log('Sending new task to the server:', newTask);
-
                     fetch(`http://localhost:8080/projects/${project.id}/tasks`, {
                         method: 'POST',
                         headers: {
@@ -271,19 +272,17 @@
                         if (response.ok) {
                             return response.json();
                         } else {
-                            console.error('Error adding task to the server');
-                            throw new Error('Error adding task to the server');
+                            throw new Error('Viga kasutaja lisamisel');
                         }
                     })
                     .then(newTaskData => {
-                        console.log('New task data from server:', newTaskData);
                         project.tasks.find(task => task.report_id === newTask.report_id).user = newTaskData.user;
                         setTimeout(() => {
                             this.fetchProjects();
                         }, 100);
                     })
                     .catch(error => {
-                        console.error('An error occurred:', error);
+                        console.error('Error:', error);
                     });
                 },
                 removeTask: async function(project, reportId) {
@@ -295,7 +294,6 @@
                     }
                 },
                 updateTaskOnServer: function(project, task) {
-                    // Отправьте данные обновленной задачи на сервер, чтобы сохранить изменения
                     fetch(`http://localhost:8080/projects/${project.id}/tasks/${task.report_id}`, {
                         method: 'PUT',
                         headers: {
@@ -305,13 +303,13 @@
                     })
                     .then(response => {
                         if (response.ok) {
-                            console.log('Task updated successfully.');
+                            console.log('Uuendatud.');
                         } else {
-                            console.error('Error updating task on the server', response);
+                            console.error('Viga uuendamisel', response);
                         }
                     })
                     .catch(error => {
-                        console.error('An error occurred:', error);
+                        console.error('Error', error);
                     });
                 },
                 fetchProjects: async function() {

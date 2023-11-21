@@ -1,22 +1,21 @@
 {
-  "name": "games_pivotal",
+  "name": "projektid",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ArtjomVolkov/games_pivotal.git"
+    "url": "git+https://github.com/ArtjomVolkov/projektid_API.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ArtjomVolkov/games_pivotal/issues"
+    "url": "https://github.com/ArtjomVolkov/projektid_API/issues"
   },
-  "homepage": "https://github.com/ArtjomVolkov/games_pivotal#readme",
+  "homepage": "https://github.com/ArtjomVolkov/projektid_API#readme",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
@@ -24,5 +23,9 @@
     "swagger-ui-express": "^5.0.0",
     "vue": "^3.3.8",
     "yamljs": "^0.3.0"
-  }
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "description": ""
 }
